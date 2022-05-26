@@ -1,11 +1,12 @@
 import { AppAction } from "state/AppAction"
 import { Reducer } from "redux"
 
+
 type State = {
     stack: number[],
     currentValue: number,
-    history: number[],
-    dot: boolean 
+    history: State[],
+    dot: number 
 
 }
 
@@ -13,7 +14,7 @@ const initialState: State = {
     stack : [],
     currentValue: 0,
     history : [],
-    dot: false
+    dot: 0
 }
 
 export const polishCalcReducer: Reducer<State, AppAction> = (
@@ -22,18 +23,21 @@ export const polishCalcReducer: Reducer<State, AppAction> = (
 ) => {
     switch (action.type) {
         case 'NEW_VALUE':
+            if (state.dot === 2) break
             return {
                 ...state,
                 currentValue: state.dot ?
                              Number("" + state.currentValue + "." + action.payload) :
                               Number("" + state.currentValue + action.payload),
-
+                dot: state.dot ? 2 : 0
             }
         case 'INTRO':
             return {
                 ...state,
                 stack: state.stack.concat(state.currentValue),
-                currentValue: 0
+                history: state.history.concat(state),
+                currentValue: 0,
+                dot: 0
             }
         case 'SQUARE_ROOT':
             let operand1 = state.stack[state.stack.length - 1]
@@ -50,7 +54,15 @@ export const polishCalcReducer: Reducer<State, AppAction> = (
         case 'DOT':
             return {
                 ...state,
-                dot: true
+                dot: 1
+            }
+        case 'UNDO':
+            if (state.history.length === 0) break
+            let lastState = state.history[state.history.length - 1]
+            return {
+                ...lastState,
+                history: state.history.slice(0,-1)
+                    
             }
         default:
             break;
@@ -67,25 +79,29 @@ export const polishCalcReducer: Reducer<State, AppAction> = (
             return {
                 ...state,
                 
-                stack: newStack.concat(operand1 + operand2)
+                stack: newStack.concat(operand1 + operand2),
+                history: state.history.concat(state)
             }
         case 'SUBSTRACTION':
             return {
                 ...state,
                 
-                stack: newStack.concat(operand1 - operand2)
+                stack: newStack.concat(operand1 - operand2),
+                history: state.history.concat(state)
             }
         case 'MULTIPLICATION':
             return {
                 ...state,
                 
-                stack: newStack.concat(operand1 * operand2)
+                stack: newStack.concat(operand1 * operand2),
+                history: state.history.concat(state)
             }
         case 'DIVITION':
             return {
                 ...state,
                 
-                stack: newStack.concat(operand1 / operand2)
+                stack: newStack.concat(operand1 / operand2),
+                history: state.history.concat(state)
             }
             
         default:
