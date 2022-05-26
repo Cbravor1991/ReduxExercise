@@ -1,5 +1,5 @@
 import { RootState } from '..';
 
 export const selectCurrentNumber = (state: RootState): number => {
-  return 0;
+  return state.content.polish.currentValue
 };
