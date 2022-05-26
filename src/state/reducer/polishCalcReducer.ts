@@ -68,7 +68,7 @@ export const polishCalcReducer: Reducer<State, AppAction> = (
             break;
     }
 
-        
+    // Podria ir todo esto en otro reducer
     let operand1 = state.stack[state.stack.length - 1]
     let operand2 = state.stack[state.stack.length - 2]
             
